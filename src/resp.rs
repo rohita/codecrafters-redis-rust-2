@@ -1,7 +1,7 @@
+use anyhow::Result;
+use bytes::{BufMut, BytesMut};
 use std::io::{Read, Write};
 use std::net::TcpStream;
-use bytes::{BufMut, BytesMut};
-use anyhow::{anyhow, Result};
 
 #[derive(Clone, Debug)]
 pub enum RespType {
