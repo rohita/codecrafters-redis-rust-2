@@ -1,7 +1,9 @@
 mod resp;
 mod command;
+mod db;
 
 use std::net::{TcpListener, TcpStream};
+use crate::command::Command;
 
 fn main() {
     let listener = TcpListener::bind("127.0.0.1:6379").unwrap();
@@ -22,13 +24,14 @@ fn main() {
 
 fn handle_client(stream: TcpStream) {
     let mut handler = resp::RespHandler::new(stream);
-    let mut storage: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+    let mut storage= db::Db::new();
 
     loop {
         let value = handler.read_value().unwrap();
         println!("Got value {:?}", value);
         let response = if let Some(v) = value {
-            command::handle(v, &mut storage)
+            let mut command = Command::new(v);
+            command.handle(&mut storage)
         } else {
             break;
         };
