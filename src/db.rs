@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::time::Instant;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Item {
     value: String,
     created: Instant,
@@ -14,15 +14,15 @@ impl Item {
     }
 }
 
+#[derive(Clone)]
 pub struct Db {
-    pub storage: HashMap<String, Item>,
+    config: HashMap::<String, String>,
+    storage: HashMap<String, Item>,
 }
 
 impl Db {
-    pub fn new() -> Self {
-        Db {
-            storage: HashMap::new(),
-        }
+    pub fn from_config(config: HashMap::<String, String>) -> Self {
+        Db { config, storage: HashMap::new() }
     }
 
     pub fn set(&mut self, key: String, value: String, expires_ms: u128) {
@@ -34,11 +34,15 @@ impl Db {
         self.storage.insert(key, item);
     }
 
-    pub fn get(&self, key: String) -> Option<String> {
-        let item = self.storage.get(&key)?;
+    pub fn get(&self, key: &String) -> Option<String> {
+        let item = self.storage.get(key)?;
         match item.is_expired() {
             true => None,
             false => Some(item.value.clone()),
         }
+    }
+
+    pub fn config_get(&self, key: &String) -> Option<String> {
+        self.config.get(key).cloned()
     }
 }

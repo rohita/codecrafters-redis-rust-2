@@ -26,10 +26,10 @@ impl RespData {
         }
     }
 
-    pub fn unpack_str(self) -> String {
+    pub fn unpack_str(&self) -> String {
         match self {
-            RespData::SimpleString(s) => s,
-            RespData::BulkString(s) => s,
+            RespData::SimpleString(s) => s.to_string(),
+            RespData::BulkString(s) => s.to_string(),
             _ => panic!("Expected command to be a simple or bulk string")
         }
     }

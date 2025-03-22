@@ -1,5 +1,8 @@
 mod get;
 mod set;
+mod ping;
+mod echo;
+mod config;
 
 use crate::resp::RespData;
 use crate::db::Db;
@@ -17,10 +20,11 @@ impl Command {
 
     pub fn handle(&mut self, storage: &mut Db) -> RespData {
         match self.name.to_lowercase().as_str() {
-            "ping" => RespData::SimpleString("PONG".to_string()),
-            "echo" => self.args.first().unwrap().clone(),
+            "ping" => self.ping(),
+            "echo" => self.echo(),
             "set" => self.set(storage),
             "get" => self.get(storage),
+            "config" => self.config(storage),
             c => RespData::Error(format!("ERR Cannot handle command {c}")),
         }
     }
@@ -29,7 +33,7 @@ impl Command {
 fn extract_command(value: RespData) -> (String, Vec<RespData>) {
     match value {
         RespData::Array(a) => (
-            a.first().unwrap().clone().unpack_str(),
+            a.first().unwrap().unpack_str(),
             a.into_iter().skip(1).collect(),
         ),
         _ => panic!("Unexpected command format"),

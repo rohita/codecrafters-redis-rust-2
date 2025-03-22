@@ -4,8 +4,8 @@ use crate::resp::RespData;
 
 impl Command {
     pub fn set(&self, storage: &mut Db) -> RespData {
-        let key = self.args[0].clone().unpack_str();
-        let value = self.args[1].clone().unpack_str();
+        let key = self.args[0].unpack_str();
+        let value = self.args[1].unpack_str();
         let expires = self.calculate_expires();
 
         if let Err(err) = expires {
@@ -21,10 +21,9 @@ impl Command {
             return Ok(0);
         }
 
-        let expiry_mode = self.args[2].clone().unpack_str();
+        let expiry_mode = self.args[2].unpack_str();
         match expiry_mode.to_lowercase().as_str() {
             "px" => self.args[3]
-                .clone()
                 .unpack_str()
                 .parse::<u128>()
                 .map_err(|_| "ERR invalid expiry value".into()),
