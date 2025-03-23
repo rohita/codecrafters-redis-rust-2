@@ -31,7 +31,7 @@ impl Command {
             "config" => self.config(storage),
             "keys" => self.keys(storage),
             "info" => self.info(storage),
-            "psync" => self.psync(),
+            "psync" => self.psync(storage),
             "replconf" => self.replconf(),
             c => RespData::Error(format!("ERR Cannot handle command {c}")),
         }

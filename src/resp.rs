@@ -3,6 +3,7 @@ use bytes::{BufMut, BytesMut};
 use std::io::{Read, Write};
 use std::net::TcpStream;
 
+#[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub enum RespData {
     SimpleString(String),
@@ -11,6 +12,8 @@ pub enum RespData {
     BulkString(String),
     Array(Vec<RespData>),
     Null,
+    File(Vec<u8>),
+    Multipart(Vec<RespData>),
 }
 
 impl RespData {
@@ -23,6 +26,8 @@ impl RespData {
             RespData::Array(v) => format!("*{}\r\n{}",
                                           v.len(), v.into_iter().map(|s| s.encode()).collect::<Vec<_>>().join("")),
             RespData::Null => "$-1\r\n".to_string(),
+            RespData::File(s) => format!("${}\r\n", s.len()),
+            RespData::Multipart(_) => panic!("Multipart cannot be encoded!"),
         }
     }
 
@@ -60,7 +65,17 @@ impl RespHandler {
     }
 
     pub fn write_value(&mut self, value: RespData) -> Result<()> {
-        self.stream.write_all(value.encode().as_bytes())?;
+        match value {
+            RespData::Multipart(vector) => {
+                vector.into_iter().try_for_each(|v| self.write_value(v))?;
+            },
+            RespData::File(file) => {
+                self.stream.write_all(format!("${}\r\n", file.len()).as_bytes())?;
+                self.stream.write_all(&file)?;
+            },
+            _ => self.stream.write_all(value.encode().as_bytes())?
+        }
+
         Ok(())
     }
 }
