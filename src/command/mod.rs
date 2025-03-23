@@ -28,7 +28,7 @@ impl Command {
             "get" => self.get(storage),
             "config" => self.config(storage),
             "keys" => self.keys(storage),
-            "info" => self.info(),
+            "info" => self.info(storage),
             c => RespData::Error(format!("ERR Cannot handle command {c}")),
         }
     }
