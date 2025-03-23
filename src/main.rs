@@ -26,6 +26,7 @@ fn main() {
         master.ping();
         master.replconf("listening-port".to_string(), port);
         master.replconf("capa".to_string(), "psync2".to_string());
+        master.psync();
     }
 
     let storage= storage::Db::from_config(config);
