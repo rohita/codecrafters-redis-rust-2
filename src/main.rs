@@ -15,9 +15,10 @@ fn main() {
         config.insert(config_key, args[index + 1].to_string());
     }
     println!("Config: {:?}", config);
-    let storage= storage::Db::from_config(config);
 
-    let listener = TcpListener::bind("127.0.0.1:6379").unwrap();
+    let port: String = config.get("port").unwrap_or(&"6379".to_string()).to_string();
+    let listener = TcpListener::bind(format!("127.0.0.1:{port}")).unwrap();
+    let storage= storage::Db::from_config(config);
 
     for stream in listener.incoming() {
         let storage = storage.clone();  // Can we avoid cloning here??
