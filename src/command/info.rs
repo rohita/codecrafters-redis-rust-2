@@ -1,9 +1,7 @@
 use crate::command::Command;
+use crate::{DEFAULT_MASTER_OFFSET, DEFAULT_MASTER_REPLID};
 use crate::resp::RespData;
 use crate::storage::Db;
-
-const DEFAULT_MASTER_REPLID: &str = "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb";
-const DEFAULT_MASTER_OFFSET: &str = "0";
 
 impl Command {
     pub fn info(&self, storage: &Db) -> RespData {
