@@ -4,6 +4,7 @@ mod ping;
 mod echo;
 mod config;
 mod keys;
+mod info;
 
 use crate::resp::RespData;
 use crate::storage::Db;
@@ -27,6 +28,7 @@ impl Command {
             "get" => self.get(storage),
             "config" => self.config(storage),
             "keys" => self.keys(storage),
+            "info" => self.info(),
             c => RespData::Error(format!("ERR Cannot handle command {c}")),
         }
     }
