@@ -5,6 +5,8 @@ mod echo;
 mod config;
 mod keys;
 mod info;
+mod psync;
+mod replconf;
 
 use crate::resp::RespData;
 use crate::storage::Db;
@@ -29,6 +31,8 @@ impl Command {
             "config" => self.config(storage),
             "keys" => self.keys(storage),
             "info" => self.info(storage),
+            "psync" => self.psync(),
+            "replconf" => self.replconf(),
             c => RespData::Error(format!("ERR Cannot handle command {c}")),
         }
     }
