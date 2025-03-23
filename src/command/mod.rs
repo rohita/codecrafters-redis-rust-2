@@ -3,9 +3,10 @@ mod set;
 mod ping;
 mod echo;
 mod config;
+mod keys;
 
 use crate::resp::RespData;
-use crate::db::Db;
+use crate::storage::Db;
 
 pub struct Command {
     name: String,
@@ -25,6 +26,7 @@ impl Command {
             "set" => self.set(storage),
             "get" => self.get(storage),
             "config" => self.config(storage),
+            "keys" => self.keys(storage),
             c => RespData::Error(format!("ERR Cannot handle command {c}")),
         }
     }

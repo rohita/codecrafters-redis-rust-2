@@ -1,6 +1,6 @@
 mod resp;
 mod command;
-mod db;
+mod storage;
 
 use std::collections::HashMap;
 use std::env;
@@ -15,7 +15,7 @@ fn main() {
         config.insert(config_key, args[index + 1].to_string());
     }
     println!("Config: {:?}", config);
-    let storage= db::Db::from_config(config);
+    let storage= storage::Db::from_config(config);
 
     let listener = TcpListener::bind("127.0.0.1:6379").unwrap();
 
@@ -35,7 +35,7 @@ fn main() {
     }
 }
 
-fn handle_client(stream: TcpStream, mut storage: db::Db) {
+fn handle_client(stream: TcpStream, mut storage: storage::Db) {
     let mut handler = resp::RespHandler::new(stream);
 
     loop {
