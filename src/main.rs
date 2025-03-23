@@ -1,13 +1,12 @@
 mod resp;
 mod command;
 mod storage;
+mod client;
 
+use crate::command::Command;
 use std::collections::HashMap;
 use std::env;
-use std::io::Write;
 use std::net::{TcpListener, TcpStream};
-use crate::command::Command;
-use crate::resp::RespData;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -21,11 +20,12 @@ fn main() {
     let port: String = config.get("port").unwrap_or(&"6379".to_string()).to_string();
     let listener = TcpListener::bind(format!("127.0.0.1:{port}")).unwrap();
 
-    if let Some(master) = config.get("replicaof") {
-        let addr = master.replace(' ', ":");
-        let mut sock = TcpStream::connect(addr).unwrap();
-        let ping_resp = RespData::Array(vec![RespData::BulkString("PING".to_string())]);
-        sock.write_all(ping_resp.encode().as_bytes()).unwrap();
+    if let Some(addr) = config.get("replicaof") {
+        let addr = addr.replace(' ', ":");
+        let mut master = client::ReplicaClient::connect(addr);
+        master.ping();
+        master.replconf("listening-port".to_string(), port);
+        master.replconf("capa".to_string(), "psync2".to_string());
     }
 
     let storage= storage::Db::from_config(config);
